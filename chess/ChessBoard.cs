@@ -36,61 +36,90 @@ namespace ConsoleGames
             }
         }
 
+
+
+
         protected bool[] HorizontalMovementCheck(GridPos curPos, byte pieceTeam)
         {
-            //this generates the possible spots available spots on the horizontal axis of the piece
-            bool[] validRowSpots =  { false, false, false, false, false, false, false, false };
+            //temporary array used for processing positions
             bool[] validRowSpotsTemp = { false, false, false, false, false, false, false, false };
 
-            
-
-
-            for (byte colIndex = 0; colIndex < 8; colIndex++)
+            //go through the column and check to see if there is a free space
+            for (byte RowIndex = 0; RowIndex < 8; RowIndex++)
             {
-                if (GetPiece(colIndex, curPos.y).GetTeam() == 0)
+                if (GetPiece(RowIndex, curPos.y).GetTeam() == 0)
                 {
-                    validRowSpotsTemp[colIndex] = true;
+                    validRowSpotsTemp[RowIndex] = true;
                 }
             }
-            int lowCheck = 0;
-            int highCheck = 0;
-            bool lowCheckfin = false;
-            bool highCheckfin = false;
-            foreach (bool temp in validRowSpotsTemp)
-            {
-                if ((curPos.x + lowCheck) >0)
-                {
-                    Console.WriteLine((curPos.x + lowCheck));
-                    if (validRowSpotsTemp[(curPos.x + lowCheck)] && !lowCheckfin)
-                    {
-                        validRowSpots[curPos.x + lowCheck] = true;
-                    }else
-                    {
-                        lowCheckfin = true;
-                    }
-                }
-                if ((highCheck + curPos.x) < 8)
-                {
-                    if ((validRowSpotsTemp[(curPos.x + highCheck)])&& !highCheckfin)
-                    {
-                        validRowSpots[curPos.x + highCheck] = true;
-                    }else
-                    {
-                        highCheckfin = true;
-                    }
-                }
 
-                lowCheck = lowCheck - 1;
-                highCheck = highCheck + 1;
-            }
-            return validRowSpots;
+            return CheckValidLine(validRowSpotsTemp, curPos, pieceTeam,false);
         }
+
+
+        protected bool[] DiagonalMovementCheck(GridPos curPos, byte pieceTeam,bool isGoingUp)
+        {
+            //temporary array used for processing positions
+            bool[] validSpotsTemp = { false, false, false, false, false, false, false, false };
+
+            byte curX = curPos.x;
+            byte curY = curPos.y;
+            bool swapcheck = false;//swaps between the direction of the check
+            bool checking = true;
+
+            while (checking)
+            {
+                if (curX < 0 || curY < 0)
+                {
+                    checking = false;//break out of the loop if either index is out of bounds
+                }
+
+                if (curX >= 7 || curY >= 7)//if either of the indices are out of bounds swap the direction of the check
+                {
+                    Console.WriteLine("SWAPPING");
+                    swapcheck = true;
+                    curX = curPos.x;
+                    curY = curPos.y;
+                }
+                else
+                {
+                   if (GetPiece(curX, curY).GetTeam() == 0)
+                   {
+                      validSpotsTemp[curX] = true;
+                   }
+                }
+                Console.WriteLine(swapcheck);
+                Console.WriteLine(curX);
+
+                if (swapcheck)
+                {
+                    curX++;
+                    curY++;
+                }
+                else
+                {
+
+                    curX= (byte)(curX - 1);
+                    curY= (byte)(curY - 1);
+                }
+            }
+
+
+
+            return validSpotsTemp;//test return
+
+
+            return CheckValidLine(validSpotsTemp, curPos, pieceTeam, false,true);
+        }
+
+
 
         protected bool[] VerticalMovementCheck(GridPos curPos, byte pieceTeam)
         {
-            //this generates the possible spots available spots on the horizontal axis of the piece
-            bool[] validColSpots = { false, false, false, false, false, false, false, false };
+            //temporary array used for processing positions
             bool[] validColSpotsTemp = { false, false, false, false, false, false, false, false };
+
+            //go through the column and check to see if there is a free space
             for (byte colIndex = 0; colIndex < 8; colIndex++)
             {
                 if (GetPiece(curPos.x, colIndex).GetTeam() == 0)
@@ -99,31 +128,54 @@ namespace ConsoleGames
                 }
             }
 
+            return CheckValidLine(validColSpotsTemp, curPos, pieceTeam,true); ;
+        }
 
 
 
-            int lowCheck = 0;
-            int highCheck = 0;
+        //wrapper for check valid line
+        protected bool[] CheckValidLine(bool[] validLineSpotsTemp, GridPos curPos, byte pieceTeam, bool isVertical)
+        {
+            return CheckValidLine(validLineSpotsTemp, curPos, pieceTeam, isVertical, false);
+        }
+
+
+
+        protected bool[] CheckValidLine(bool[] validLineSpotsTemp,GridPos curPos, byte pieceTeam,bool isVertical,bool isDiagonal)
+        {
+            //temp holder array for to return the valid positions
+            bool[] validLineSpots = { false, false, false, false, false, false, false, false };
+
+
+            int startIndex = curPos.y;
+            if (!isVertical) { startIndex = curPos.x;};
+
+            int lowCheck = startIndex - 1;//start at the spot to the left of the current piece
+            int highCheck = startIndex + 1;//start at the spot to the right of the current piece
+
+            //flags for determining when movement is no longer possible
             bool lowCheckfin = false;
             bool highCheckfin = false;
-            foreach (bool temp in validColSpotsTemp)
+
+
+            foreach (bool temp in validLineSpotsTemp)//run over every element in the passed array parameter
             {
-                if ((curPos.y + lowCheck ) >= 0)
+                if ((lowCheck) >= 0) //lower bounds check
                 {
-                    if (validColSpotsTemp[curPos.y + lowCheck] && !lowCheckfin)
+                    if (validLineSpotsTemp[lowCheck] && !lowCheckfin)
                     {
-                        validColSpots[curPos.y + lowCheck] = true;
+                        validLineSpots[lowCheck] = true;
                     }
                     else
                     {
                         lowCheckfin = true;
                     }
                 }
-                if ((highCheck + curPos.y) < 8)
+                if ((highCheck) < 8) //upper bounds check
                 {
-                    if ((validColSpotsTemp[curPos.y + highCheck]) && !highCheckfin)
+                    if ((validLineSpotsTemp[highCheck]) && !highCheckfin)
                     {
-                        validColSpots[curPos.y + highCheck] = true;
+                        validLineSpots[highCheck] = true;
                     }
                     else
                     {
@@ -131,15 +183,48 @@ namespace ConsoleGames
                     }
                 }
 
-                lowCheck = lowCheck - 1;
-                highCheck = highCheck + 1;
+                //add/remove from the current position to shift the check. Stops adding/subtracting when an edge is reached
+                if (!lowCheckfin) { lowCheck = lowCheck - 1; }
+                if (!highCheckfin) { highCheck = highCheck + 1; }
             }
 
-                return validColSpots;
+
+
+            byte pos1 = curPos.x;
+            byte pos2 = (Byte)highCheck;
+            if (!isVertical)
+            {
+                pos1 = (Byte)highCheck;
+                pos2 = curPos.y;
+            }
+
+            if (highCheck < 8)//bounding check
+            {
+                //gets the team of the current position and checks if it is not the current player
+                if (GetPiece(pos1,pos2).GetTeam() != 0 && GetPiece(pos1, pos2).GetTeam() != pieceTeam)
+                {
+
+                    validLineSpots[highCheck] = true;
+                }
+
+
+
+
+
+            }
+
+            if (lowCheck >= 0)//bounding check
+            {
+                //gets the team of the current position and checks if it is not the current player
+                if (GetPiece(curPos.x, (Byte)lowCheck).GetTeam() != 0 && GetPiece(curPos.x, (Byte)lowCheck).GetTeam() != pieceTeam)
+                {
+                    //add the current space to the possible move list (for attack)
+                    validLineSpots[lowCheck] = true;
+                }
+            }
+
+            return validLineSpots;
         }
-
-
-
 
         public List<GridPos> GetPossibleMoves(GridPos curPos)
         {
@@ -159,7 +244,7 @@ namespace ConsoleGames
                             if (validHorSpots[i])
                             {
                                 validGrids.Add(new GridPos(i, curPos.y));
-         
+                                Console.WriteLine("Valid HorizontalMove: " + i + ":" + curPos.y);
                             }
                         }
                         for (int i = 0; i < validVertSpots.Length; i++)
@@ -167,6 +252,7 @@ namespace ConsoleGames
                             if (validVertSpots[i])
                             {
                                 validGrids.Add(new GridPos(curPos.x, i));
+                                Console.WriteLine("Valid VerticalMove: " + i + ":" + curPos.y);
                             }
                         }
 
@@ -180,6 +266,28 @@ namespace ConsoleGames
                     }
                 case 'B'://Bishop
                     {
+                        bool[] validUpSpots = DiagonalMovementCheck(curPos, pieceTeam,true);
+                        bool[] validDownSpots = DiagonalMovementCheck(curPos, pieceTeam,false);
+
+                        for (int i = 0; i < validUpSpots.Length; i++)
+                        {
+                            if (validUpSpots[i])
+                            {
+                                validGrids.Add(new GridPos(i, curPos.y));
+                                Console.WriteLine("Valid DiagonalMove: " + i + ":" + curPos.y);
+                            }
+                        }
+                        for (int i = 0; i < validDownSpots.Length; i++)
+                        {
+                            if (validDownSpots[i])
+                            {
+                                validGrids.Add(new GridPos(curPos.x, i));
+                                Console.WriteLine("Valid DiagonalMove: " + i + ":" + curPos.y);
+                            }
+                        }
+
+
+
 
 
                         break;
