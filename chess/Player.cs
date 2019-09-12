@@ -11,10 +11,9 @@ namespace ConsoleGames
     {
 
         protected ConsoleColor color;
-        protected byte team;
+        private byte team;
         protected String name;
-        protected int score;
-        protected bool isTurn;//important for win condition
+        private int score;
 
         public Player(String newName)
         {
@@ -22,15 +21,62 @@ namespace ConsoleGames
             team = 0;
             color = ConsoleColor.Black;
             score = 0;
-            isTurn = false;
         }
 
+        public Player(String newName,int teamId)
+        {
+            name = newName;
+            team = (byte)teamId;
+            score = 0;
+            switch (teamId)
+            {
+                case 0:
+                    {
+                        color = ConsoleColor.Gray;
+                        break;
+                    }
+                case 1:
+                    {
+                        color = ConsoleColor.Red;
+                        break;
+                    }
+                case 2:
+                    {
+                        color = ConsoleColor.Blue;
+                        break;
+                    }
+                default:
+                    {
+                        color = ConsoleColor.Black;
+                        break;
+                    }
+            }
 
+        }
+
+        public ConsoleColor GetColor()
+        {
+            return color;
+        }
         public String GetName()
         {
             return name;
         }
 
+        public byte GetTeam()
+        {
+            return team;
+        }
+
+        public void SetTeam(byte newTeam)
+        {
+            team = newTeam;
+        }
+
+        public void SetTeam(int newTeam)
+        {
+            team = (byte)newTeam;
+        }
 
     }
 }

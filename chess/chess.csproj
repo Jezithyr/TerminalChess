@@ -43,9 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="chesProg.cs" />
     <Compile Include="ChessBoard.cs" />
     <Compile Include="Gameboard.cs" />
-    <Compile Include="H:\prog1\chesProg.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

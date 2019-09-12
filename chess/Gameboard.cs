@@ -10,7 +10,8 @@ namespace ConsoleGames
     {
         protected byte size = 5;
         protected GamePiece[][] grid;
-
+        protected bool Gameover = false;
+        protected Player winner = null;
 
 
         public Gameboard(byte inSize)
@@ -37,6 +38,18 @@ namespace ConsoleGames
             }
         }
 
+        public void CleanHighlights()
+        {
+            foreach (GamePiece[] row in grid)
+            {
+                foreach (GamePiece piece in row)
+                {
+                    piece.SetHighlight(ConsoleColor.Black);
+                }
+
+            }
+        }
+
         public void HighLightGrids(GridPos[] gridPositions,ConsoleColor highlight)
         {
             foreach (GridPos curGrid in gridPositions)
@@ -49,12 +62,17 @@ namespace ConsoleGames
 
         public int[] ParseGridPos(String inputString)
         {
-            inputString = inputString.ToLower();
+            Console.Write("Test");
             int[] returnArray = new int[2] { -1, -1 };
-            if ((inputString.Length != 2))
+
+            if (inputString == null || inputString.Length != 2)//return an empty array if the input is not 2 chars
             {
-                return returnArray; //return an empty array if the input is less than 2 chars
+                return returnArray;
             }
+
+            inputString = inputString.ToLower();
+            
+          
             char char1 = inputString[0];
             char char2 = inputString[1];
 
@@ -65,7 +83,7 @@ namespace ConsoleGames
                 return returnArray; //if the first character is not a valid letter
             }
 
-            if ((49 > Convert.ToInt32(char2)) && (Convert.ToInt32(char2) > 57))
+            if ((48 > Convert.ToInt32(char2)) && (Convert.ToInt32(char2) > 57))
             {
                 returnArray[1] = -2;
                 return returnArray; //if the second character is not a valid number
@@ -75,6 +93,7 @@ namespace ConsoleGames
             int rowIndex = 0;
             colIndex = Convert.ToInt32(char1) - 97;
             rowIndex = Convert.ToInt32(char2) - 49;
+
             if (colIndex >= size || rowIndex >= size)
             {
                 return returnArray;
@@ -85,7 +104,7 @@ namespace ConsoleGames
             }
         }
 
-
+        public virtual void Move(GridPos piece1, GridPos piece2, Player player) { }
 
 
         //gets the board as a string NOTE: DOES NOT include color!
@@ -159,6 +178,7 @@ namespace ConsoleGames
 
         public GamePiece GetPiece(GridPos pos)
         {
+            Console.WriteLine(pos.x + ":" + pos.y);
             return grid[pos.x][pos.y];
         }
 
