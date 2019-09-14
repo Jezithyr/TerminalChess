@@ -159,8 +159,6 @@ namespace ConsoleGames
             Console.WriteLine(activePlayer.GetName() + "'s Turn. Pick a piece by typing it's position or surrender by typing SURRENDER");
             String userInput = Console.ReadLine();
 
-            //surrender flag goes here
-
             int[] SelectionPos = Game.ParseGridPos(userInput);
 
             if ((SelectionPos[0] < 0)|| (SelectionPos[1] < 0))
@@ -199,7 +197,7 @@ namespace ConsoleGames
         static protected Player Intro()
         {
             Console.WriteLine("\n\nWelcome to CHESS! Press any key to start...");
-            //Console.ReadLine();
+            Console.ReadLine();
             Console.Clear();
             Console.Write("\n\nChess is a TWO player game, teams are symbolized with the colors ");
             Console.ForegroundColor = ConsoleColor.Red;
@@ -217,46 +215,41 @@ namespace ConsoleGames
             Console.BackgroundColor = ConsoleColor.Black;
             Console.WriteLine(" Tile.");
             Console.WriteLine("\nLet's begin! Player One,\n Please Enter your name:");
-            //String player1Name = Console.ReadLine();
-
-            String player1Name = "test1";
+            String player1Name = Console.ReadLine();
 
             Console.WriteLine("\n Player One is: " + player1Name);
 
             player1 = new Player(player1Name,1);
 
-            //Thread.Sleep(1000);
+           Thread.Sleep(1000);
             Console.Clear();
 
             Console.WriteLine("Player Two,\n Please Enter your name:");
-            //String player2Name = Console.ReadLine();
+            String player2Name = Console.ReadLine();
 
-            String player2Name = "test1";
 
             Console.WriteLine("\n Player Two is: " + player2Name);
 
             player2 = new Player(player2Name, 2);
 
-            //Thread.Sleep(1000);
+            Thread.Sleep(1000);
             Console.Clear();
 
             Player startPlayer = null;
             String userInput;
-
-            userInput = "1";
 
             bool invalidInput = true;
             int userSelection = 0;
             while (invalidInput)
             {
                 Console.WriteLine("Who would like to start? 1 for Player One, 2 for Player Two, and 3 for random:");
-                //userInput = Console.ReadLine();
+                userInput = Console.ReadLine();
                 invalidInput = !(Int32.TryParse(userInput, out userSelection));
                 if (userSelection > 3 || userSelection < 1) { invalidInput = true; };
                 if (invalidInput)
                 {
                     Console.WriteLine("Invalid input please try again!");
-                    //Thread.Sleep(1000);
+                    Thread.Sleep(1000);
                     Console.Clear();
                 }
             }
@@ -304,16 +297,15 @@ namespace ConsoleGames
             return startPlayer;
         }
 
-        static private void StartTurn(Player player)
+        static private Player StartTurn(Player player)
         {
             bool validMove = false;
             String userInput;
-            int[] gridCords;
-            int[] targetCords;
+            int[] gridCords, targetCords;
             GridPos targetGrid = new GridPos(99,99);
             while (!validMove)
             {
-               // Console.Clear();
+                Console.Clear();
                 Game.DrawBoard();
                 Console.Write("\n It's ");
                 Console.ForegroundColor = player.GetColor();
@@ -324,9 +316,7 @@ namespace ConsoleGames
                 bool moveSelection = true;
                 gridCords = Game.ParseGridPos(userInput);
 
-                Console.WriteLine(gridCords[0] + ";" + gridCords[1]);
-
-                if (gridCords[0] > 0 || gridCords[1] > 0)//nullcheck the entered coordinates
+                if (gridCords[0] >= 0 || gridCords[1] >= 0)//nullcheck the entered coordinates
                 {
                     List<GridPos> validMoves = ((Chessboard)Game).GetPossibleMoves(gridCords,player);
                     if (validMoves.Count == 0)
@@ -352,27 +342,33 @@ namespace ConsoleGames
                                     moveSelection = false;
                                 }
                             });
+
+                            if (moveSelection) {
+                                Console.WriteLine("That is not a valid move, please try again!");
+                                Thread.Sleep(500);
+                            }
                         }
                         Game.Move(new GridPos((byte)gridCords[0], (byte)gridCords[1]), targetGrid, player);
+                        validMove = true;
                         Console.Clear();
-
-
-
-
                     }
 
                 }else
                 {
                     Console.WriteLine("Invalid Input, please try again!");
                 }
-
-
             }
 
+            if (player == player1)
+            {
+                return player2;
+            }
 
-
-
-
+            if (player == player2)
+            {
+                return player1;
+            }
+            return null;
         }
 
 
@@ -390,23 +386,19 @@ namespace ConsoleGames
         {
 
             startPlayer = Intro();
-            Player followPlayer = player2;
-            if (startPlayer == player2) { followPlayer = player1; };
-
             Game = new Chessboard();
+
             isStartPlayerTurn = true;
+            Player currentPlayer = startPlayer;
             bool GameRunning = true;
             while (GameRunning)
             {
-                if (isStartPlayerTurn)
+                currentPlayer = StartTurn(currentPlayer);
+                if (Game.getWinner() != null)
                 {
-                    StartTurn(startPlayer);
-                } else
-                {
-                    StartTurn(followPlayer);
-
+                    Console.Clear();
+                    Console.WriteLine("Player " + Game.getWinner().GetName() + " is the winner!");
                 }
-                isStartPlayerTurn = !isStartPlayerTurn;
             }
         }
     }

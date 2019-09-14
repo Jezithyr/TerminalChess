@@ -18,6 +18,7 @@ namespace ConsoleGames
             Char[] PieceIcons = { 'R', 'N', 'B', 'K', 'Q', 'P' };
             GamePiece BlankPiece = new GamePiece('-');
 
+            bool invertKingQueen = false;
             GamePiece[] PieceList = new GamePiece[12];
             for (byte colorIndex = 0; colorIndex < 2; colorIndex++)
             {
@@ -25,6 +26,10 @@ namespace ConsoleGames
                 {
                     PieceList[pieceIndex + (colorIndex * 6)] = new GamePiece(PieceIcons[pieceIndex], (byte)(colorIndex + 1));
                 }
+                invertKingQueen = !invertKingQueen;
+                char temp = PieceIcons[3];
+                PieceIcons[3] = 'Q';
+                PieceIcons[4] = temp;
             }
             for (byte index = 0; index < 5; index++)
             {
@@ -55,6 +60,7 @@ namespace ConsoleGames
 
             return CheckValidLine(validRowSpotsTemp, curPos, pieceTeam,false);
         }
+
 
 
         protected GridPos[] DiagonalMovementCheck(GridPos curPos, byte pieceTeam,bool flip)
@@ -92,19 +98,23 @@ namespace ConsoleGames
                             validSpotsTemp[lowCheckX] = new GridPos((byte)lowCheckX, (byte)highCheckY);
 
                         }
+                        else if (foundPieceTeam == pieceTeam)
+                        {
+                            lowCheckfin = true;
+                        }
+
                         else if (foundPieceTeam != pieceTeam)
                         {
                             validSpotsTemp[lowCheckX] = new GridPos((byte)lowCheckX, (byte)highCheckY);
                             lowCheckfin = true;
                         }
-
                     }
                     else
                     {
                         lowCheckfin = true;
                     }
 
-                    if (highCheckX < 8 && lowCheckY >= 0 && !highCheckfin)//bounds check
+                    if (highCheckX <8 && lowCheckY >= 0 && !highCheckfin)//bounds check
                     {
                         byte foundPieceTeam = GetPiece((byte)highCheckX, (byte)lowCheckY).GetTeam();//gets the team from the peice on the specified position
 
@@ -114,11 +124,16 @@ namespace ConsoleGames
                             validSpotsTemp[highCheckX] = new GridPos((byte)highCheckX, (byte)lowCheckY);
 
                         }
+                        else if (foundPieceTeam == pieceTeam)
+                        {
+                            highCheckfin = true;
+                        }
                         else if (foundPieceTeam != pieceTeam)
                         {
                             validSpotsTemp[highCheckX] = new GridPos((byte)highCheckX, (byte)lowCheckY);
                             highCheckfin = true;
                         }
+                        
                     }
                     else
                     {
@@ -153,6 +168,10 @@ namespace ConsoleGames
                             validSpotsTemp[lowCheckX] = new GridPos((byte)lowCheckX, (byte)lowCheckY);
 
                         }
+                        else if (foundPieceTeam == pieceTeam)
+                        {
+                            lowCheckfin = true;
+                        }
                         else if (foundPieceTeam != pieceTeam)
                         {
                             validSpotsTemp[lowCheckX] = new GridPos((byte)lowCheckX, (byte)lowCheckY);
@@ -174,6 +193,10 @@ namespace ConsoleGames
 
                             validSpotsTemp[highCheckX] = new GridPos((byte)highCheckX, (byte)highCheckY);
 
+                        }
+                        else if (foundPieceTeam == pieceTeam)
+                        {
+                            highCheckfin = true;
                         }
                         else if (foundPieceTeam != pieceTeam)
                         {

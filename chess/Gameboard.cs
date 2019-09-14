@@ -14,6 +14,12 @@ namespace ConsoleGames
         protected Player winner = null;
 
 
+
+        public Player getWinner()
+        {
+            return winner;
+        }
+
         public Gameboard(byte inSize)
         {
             if (inSize > 9)//board size cannot be greater than 9 because of the ASCII shortcut for printing the board to the user
@@ -62,7 +68,6 @@ namespace ConsoleGames
 
         public int[] ParseGridPos(String inputString)
         {
-            Console.Write("Test");
             int[] returnArray = new int[2] { -1, -1 };
 
             if (inputString == null || inputString.Length != 2)//return an empty array if the input is not 2 chars
@@ -178,8 +183,7 @@ namespace ConsoleGames
 
         public GamePiece GetPiece(GridPos pos)
         {
-            Console.WriteLine(pos.x + ":" + pos.y);
-            return grid[pos.x][pos.y];
+          return grid[pos.x][pos.y];
         }
 
         //searches the grid for the given character and returns the position if found. 
