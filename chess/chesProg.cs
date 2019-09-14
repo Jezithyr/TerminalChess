@@ -150,7 +150,6 @@ namespace ConsoleGames
         static Player player1;
         static Player player2;
         static Player startPlayer;
-        static bool isStartPlayerTurn;
 
         static List<object> PromptForMove(Player activePlayer)
         {
@@ -342,8 +341,8 @@ namespace ConsoleGames
                                     moveSelection = false;
                                 }
                             });
-
-                            if (moveSelection) {
+                            if (moveSelection == true)
+                            {
                                 Console.WriteLine("That is not a valid move, please try again!");
                                 Thread.Sleep(500);
                             }
@@ -371,33 +370,28 @@ namespace ConsoleGames
             return null;
         }
 
-
-
-
-
-
-
-
-
-
-
-
         static void Main(string[] args)
         {
 
             startPlayer = Intro();
             Game = new Chessboard();
 
-            isStartPlayerTurn = true;
+        
             Player currentPlayer = startPlayer;
             bool GameRunning = true;
             while (GameRunning)
             {
                 currentPlayer = StartTurn(currentPlayer);
-                if (Game.getWinner() != null)
+                if (Game.IsGameover())
                 {
+                    GameRunning = false;
                     Console.Clear();
-                    Console.WriteLine("Player " + Game.getWinner().GetName() + " is the winner!");
+                    Console.Write("Player ");
+                    Console.ForegroundColor = Game.GetWinner().GetColor();
+                    Console.Write(Game.GetWinner().GetName());
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write(" is the winner!");
+                    Thread.Sleep(2000);
                 }
             }
         }

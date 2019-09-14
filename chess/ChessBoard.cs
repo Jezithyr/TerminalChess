@@ -62,168 +62,107 @@ namespace ConsoleGames
         }
 
 
-
-        protected GridPos[] DiagonalMovementCheck(GridPos curPos, byte pieceTeam,bool flip)
+        private List<GridPos> DiagonalsCheck(GridPos curPos, byte pieceTeam)
         {
-            //temporary array used for processing positions
-            GridPos nullgrid = new GridPos(99, 99);
-            GridPos[] validSpotsTemp = { nullgrid, nullgrid, nullgrid, nullgrid, nullgrid, nullgrid, nullgrid, nullgrid };
-
-
-            
-
+            List<GridPos> tempGrids = new List<GridPos> { };
             byte curX = curPos.x;
             byte curY = curPos.y;
+            byte startX = curX;
+            byte startY = curY;
 
-
-            int highCheckX = curX;
-            int highCheckY = curY;
-            int lowCheckX = curX;
-            int lowCheckY = curY;
-
-            bool lowCheckfin = false;
-            bool highCheckfin = false;
-
-            if (flip)
+            for (int count = 0;count < 8;count++) //up and to the right check
             {
+                curX++;
+                curY++;
+                if (curX < 0 || curX > 7 ||curY < 0 ||curY > 7){break;}; //break out of loop if position is out of bounds
+                byte targetTeam = GetPiece(curX, curY).GetTeam();
+                if (targetTeam == 0 || targetTeam != pieceTeam)
+                {
+                    tempGrids.Add(new GridPos(curX, curY));
+                    if (targetTeam != 0)
+                    {
+                        break; //break out of the for loop if a target is found
+                    }
+                }
+                else
+                {
+                    break;
+                }
                 
-                for (byte counter = 0; counter < 8; counter++)
-                {
-                    if (lowCheckX >= 0 && highCheckY <8 && !lowCheckfin)//bounds check
-                    {
-                        byte foundPieceTeam = GetPiece((byte)lowCheckX, (byte)highCheckY).GetTeam();//gets the team from the peice on the specified position
-
-                        if (foundPieceTeam == 0)//checks to see if position is empty
-                        {
-                            validSpotsTemp[lowCheckX] = new GridPos((byte)lowCheckX, (byte)highCheckY);
-
-                        }
-                        else if (foundPieceTeam == pieceTeam)
-                        {
-                            lowCheckfin = true;
-                        }
-
-                        else if (foundPieceTeam != pieceTeam)
-                        {
-                            validSpotsTemp[lowCheckX] = new GridPos((byte)lowCheckX, (byte)highCheckY);
-                            lowCheckfin = true;
-                        }
-                    }
-                    else
-                    {
-                        lowCheckfin = true;
-                    }
-
-                    if (highCheckX <8 && lowCheckY >= 0 && !highCheckfin)//bounds check
-                    {
-                        byte foundPieceTeam = GetPiece((byte)highCheckX, (byte)lowCheckY).GetTeam();//gets the team from the peice on the specified position
-
-                        if (foundPieceTeam == 0)//checks to see if position is empty
-                        {
-
-                            validSpotsTemp[highCheckX] = new GridPos((byte)highCheckX, (byte)lowCheckY);
-
-                        }
-                        else if (foundPieceTeam == pieceTeam)
-                        {
-                            highCheckfin = true;
-                        }
-                        else if (foundPieceTeam != pieceTeam)
-                        {
-                            validSpotsTemp[highCheckX] = new GridPos((byte)highCheckX, (byte)lowCheckY);
-                            highCheckfin = true;
-                        }
-                        
-                    }
-                    else
-                    {
-                        highCheckfin = true;
-                    }
-
-                    //add/remove from the current position to shift the check. Stops adding/subtracting when an edge is reached
-                    if (!lowCheckfin)
-                    {
-                        lowCheckX = lowCheckX - 1;
-                        highCheckY = highCheckY + 1;
-                    }
-                    if (!highCheckfin)
-                    {
-                        highCheckX = highCheckX + 1;
-                        lowCheckY = lowCheckY - 1;
-                    }
-                }
-
-
             }
-            else
+            curX = startX;
+            curY = startY;
+
+            for (int count = 0; count < 8; count++) //down and to the right check
             {
-                for (byte counter = 0; counter < 8; counter++)
+                curX++;
+                curY--;
+                if (curX < 0 || curX > 7 || curY < 0 || curY > 7) { break; }; //break out of loop if position is out of bounds
+                byte targetTeam = GetPiece(curX, curY).GetTeam();
+                if (targetTeam == 0 || targetTeam != pieceTeam)
                 {
-                    if (lowCheckX >= 0 && lowCheckY >= 0 && !lowCheckfin)//bounds check
+                    tempGrids.Add(new GridPos(curX, curY));
+                    if (targetTeam != 0)
                     {
-                        byte foundPieceTeam = GetPiece((byte)lowCheckX, (byte)lowCheckY).GetTeam();//gets the team from the peice on the specified position
-
-                        if (foundPieceTeam == 0)//checks to see if position is empty
-                        {
-                            validSpotsTemp[lowCheckX] = new GridPos((byte)lowCheckX, (byte)lowCheckY);
-
-                        }
-                        else if (foundPieceTeam == pieceTeam)
-                        {
-                            lowCheckfin = true;
-                        }
-                        else if (foundPieceTeam != pieceTeam)
-                        {
-                            validSpotsTemp[lowCheckX] = new GridPos((byte)lowCheckX, (byte)lowCheckY);
-                            lowCheckfin = true;
-                        }
-
-                    }
-                    else
-                    {
-                        lowCheckfin = true;
-                    }
-
-                    if (highCheckX < 8 && highCheckY < 8 && !highCheckfin)//bounds check
-                    {
-                        byte foundPieceTeam = GetPiece((byte)highCheckX, (byte)highCheckY).GetTeam();//gets the team from the peice on the specified position
-
-                        if (foundPieceTeam == 0)//checks to see if position is empty
-                        {
-
-                            validSpotsTemp[highCheckX] = new GridPos((byte)highCheckX, (byte)highCheckY);
-
-                        }
-                        else if (foundPieceTeam == pieceTeam)
-                        {
-                            highCheckfin = true;
-                        }
-                        else if (foundPieceTeam != pieceTeam)
-                        {
-                            validSpotsTemp[highCheckX] = new GridPos((byte)highCheckX, (byte)highCheckY);
-                            highCheckfin = true;
-                        }
-                    }
-                    else
-                    {
-                        highCheckfin = true;
-                    }
-
-                    //add/remove from the current position to shift the check. Stops adding/subtracting when an edge is reached
-                    if (!lowCheckfin)
-                    {
-                        lowCheckX = lowCheckX - 1;
-                        lowCheckY = lowCheckY - 1;
-                    }
-                    if (!highCheckfin)
-                    {
-                        highCheckX = highCheckX + 1;
-                        highCheckY = highCheckY + 1;
+                        break; //break out of the for loop if a target is found
                     }
                 }
-            }
+                else
+                {
+                    break;
+                }
 
-            return validSpotsTemp;
+            }
+            curX = startX;
+            curY = startY;
+
+            for (int count = 0; count < 8; count++) //down and to the left check
+            {
+                curX--;
+                curY--;
+                if (curX < 0 || curX > 7 || curY < 0 || curY > 7) { break; }; //break out of loop if position is out of bounds
+                byte targetTeam = GetPiece(curX, curY).GetTeam();
+                if (targetTeam == 0 || targetTeam != pieceTeam)
+                {
+                    tempGrids.Add(new GridPos(curX, curY));
+                    if (targetTeam != 0)
+                    {
+                        break; //break out of the for loop if a target is found
+                    }
+                }
+                else
+                {
+                    break;
+                }
+
+            }
+            curX = startX;
+            curY = startY;
+
+            for (int count = 0; count < 8; count++) //up and to the left check
+            {
+                curX--;
+                curY++;
+                if (curX < 0 || curX > 7 || curY < 0 || curY > 7) { break; }; //break out of loop if position is out of bounds
+                byte targetTeam = GetPiece(curX, curY).GetTeam();
+                if (targetTeam == 0 || targetTeam != pieceTeam)
+                {
+                    tempGrids.Add(new GridPos(curX, curY));
+                    if (targetTeam != 0)
+                    {
+                        break; //break out of the for loop if a target is found
+                    }
+                }
+                else
+                {
+                    break;
+                }
+
+            }
+            curX = startX;
+            curY = startY;
+
+            return tempGrids;
         }
 
         protected bool[] VerticalMovementCheck(GridPos curPos, byte pieceTeam)
@@ -488,24 +427,8 @@ namespace ConsoleGames
 
                 case 'B'://Bishop
                     {
-                        GridPos[] validUpSpots = DiagonalMovementCheck(curPos, pieceTeam, false);
-                        GridPos[] validDownSpots = DiagonalMovementCheck(curPos, pieceTeam, true);
 
-                        foreach (GridPos gridCords in validUpSpots)
-                        {
-                            if (gridCords.x != 99 || gridCords.y != 99)
-                            {
-                                validGrids.Add(gridCords);
-                            }
-                        }
-                       foreach (GridPos gridCords in validDownSpots)
-                        {
-                            if (gridCords.x != 99 || gridCords.y != 99)
-                            {
-                                validGrids.Add(gridCords);
-                            }
-                        }
-
+                        validGrids.AddRange(DiagonalsCheck(curPos, pieceTeam));
                         break;
                     }
 
@@ -533,23 +456,6 @@ namespace ConsoleGames
 
                 case 'Q'://Queen
                     {
-                        GridPos[] validUpSpots = DiagonalMovementCheck(curPos, pieceTeam, false);
-                        GridPos[] validDownSpots = DiagonalMovementCheck(curPos, pieceTeam, true);
-
-                        foreach (GridPos gridCords in validUpSpots) 
-                        {
-                            if (gridCords.x != 99 || gridCords.y != 99)//select the valid positions from the array and add them to the possible move list
-                            {
-                                validGrids.Add(gridCords);
-                            }
-                        }
-                        foreach (GridPos gridCords in validDownSpots)
-                        {
-                            if (gridCords.x != 99 || gridCords.y != 99) //select the valid positions from the array and add them to the possible move list
-                            {
-                                validGrids.Add(gridCords);
-                            }
-                        }
                         bool[] validHorSpots = HorizontalMovementCheck(curPos, pieceTeam);
                         bool[] validVertSpots = VerticalMovementCheck(curPos, pieceTeam);
                         for (int i = 0; i < validHorSpots.Length; i++)
@@ -566,6 +472,7 @@ namespace ConsoleGames
                                 validGrids.Add(new GridPos(curPos.x, i));
                             }
                         }
+                        validGrids.AddRange(DiagonalsCheck(curPos, pieceTeam));
                         break;
                     }
             }
@@ -588,7 +495,7 @@ namespace ConsoleGames
 
             if (target.GetIcon() == 'K')//WIN CONDITION CHECK!
             {
-                Gameover = true;
+                gameover = true;
                 winner = player;
             }
 

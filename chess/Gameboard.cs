@@ -10,12 +10,14 @@ namespace ConsoleGames
     {
         protected byte size = 5;
         protected GamePiece[][] grid;
-        protected bool Gameover = false;
+        protected bool gameover = false;
         protected Player winner = null;
 
-
-
-        public Player getWinner()
+        public bool IsGameover()
+        {
+            return gameover;
+        }
+        public Player GetWinner()
         {
             return winner;
         }
